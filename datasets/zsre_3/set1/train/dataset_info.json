@@ -1,0 +1,47 @@
+{
+  "citation": "",
+  "description": "",
+  "features": {
+    "subject": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "src": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "pred": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "rephrase": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "alt": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "answers": {
+      "feature": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "loc": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "loc_ans": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "cond": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": ""
+}
