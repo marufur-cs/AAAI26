@@ -8,6 +8,9 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import torch.nn.functional as F
+import math
+
 
 def to_binary(n):
   if n > 15:
@@ -56,11 +59,6 @@ x2, s2 = make_dataset(2)
 x3, s3 = make_dataset(3)
 x4, s4 = make_dataset(4)
 x5, s5 = make_dataset(5)
-
-import torch
-import torch.nn.functional as F
-import math
-
 
 class KANLinear(torch.nn.Module):
     def __init__(

@@ -8,6 +8,9 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import torch.nn.functional as F
+import math
+
 
 def norm(x):
   min  = 0
@@ -55,11 +58,6 @@ s4=norm(s4)
 s5=norm(s5)
 
 tasks = [(x1, s1), (x2, s2), (x3, s3), (x4, s4), (x5, s5)]
-
-import torch
-import torch.nn.functional as F
-import math
-
 
 class KANLinear(torch.nn.Module):
     def __init__(
@@ -363,8 +361,6 @@ def get_task_support(model, task, t):
                 sup = sup1 | sup2
                 task_support[l] = sup
               x = layer(x)
-      # Iterate through the list and apply the comparison to each tensor
-      # task_support = [ts > len(task) * 0 for ts in task_support]
       return task_support
 
 def compute_support_overlap(model, task1, task2, t):
@@ -387,17 +383,6 @@ def compute_support_union(model, task1, task2, t):
       union.append(sup1 | sup2)
     return union
 
-model = KAN([2,3,2], grid_size = 5)
-optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
-scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.8)
-criterion = nn.MSELoss()
-epochs = 10
-
-loss_task1 = []
-loss_task2 = []
-loss_task3 = []
-loss_task4 = []
-loss_task5 = []
 
 def train(model, epochs, optimizer, criterion, T):
   (trainx, trains) = tasks[T-1]
@@ -437,119 +422,19 @@ def evaluate(model, epochs, optimizer, criterion, T):
   losst2 = loss_temp/len(evalx)
   return losst2
 
-# Bounded Retention
-allPossible_F = []
-for grid in [10, 15, 20]:
-  for Task in range(1,5):
-    ex = 5
-    # grid = 20
-    epochs = 10
-    forgeting = []
-    ratioMax = []
-    ratioMean = []
-    overlapMax = []
-    overlapMean = []
 
-    for _ in range(ex):
-      model = KAN([2,3,2], grid_size = grid)
-      optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
-      criterion = nn.MSELoss()
-
-      taskLoss1 = train(model, epochs, optimizer, criterion, Task)
-      xx1 = tasks[Task-1][0]
-      xx2 = tasks[Task][0]
-      s = compute_support_overlap(model, xx1, xx2, t = 0.0)
-
-      Task2 = Task + 1
-      taskLoss2 = train(model, epochs, optimizer, criterion, Task2)
-
-      prevTaskLoss = evaluate(model, epochs, optimizer, criterion, Task)
-      f = prevTaskLoss - taskLoss1
-
-      forgeting.append(f)
-      ratioMax.append(np.round(f/np.max(s), 2))
-      ratioMean.append(np.round(f/np.mean(s), 2))
-      overlapMax.append(np.max(s))
-      overlapMean.append(np.mean(s))
-
-      allPossible_F.append(f)
-
-# Cumulative Forgetting
-Task = 4 # 1 to 4
-ex = 5
-grid = 20
+model = KAN([2,3,2], grid_size = 5)
+optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
+scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.8)
+criterion = nn.MSELoss()
 epochs = 10
-forgeting = []
-ratio = []
-overlap = []
-# torch.manual_seed(42)
-for _ in range(ex):
-  s = [] # Initialize s as an empty list
-  model = KAN([2,3,2], grid_size = grid)
-  optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
-  criterion = nn.MSELoss()
 
-  taskLoss1 = train(model, epochs, optimizer, criterion, Task)
-  xx1 = tasks[Task-1][0]
-  for nextTask in range(Task+1,6):
-    xx2 = tasks[nextTask-1][0]
-    s.extend(compute_support_overlap(model, xx1, xx2, t = 0.0)) # Extend the list s
-
-  for nextTask in range(Task+1,6):
-    taskLoss2 = train(model, epochs, optimizer, criterion, nextTask)
-
-  prevTaskLoss = evaluate(model, epochs, optimizer, criterion, Task)
-  f = prevTaskLoss - taskLoss1
-  forgeting.append(f)
-  ratio.append(np.round(f/np.sum(s), 2)) # Use np.sum(s)
-  overlap.append(np.sum(s)) # Use np.sum(s)
-
-print("Overlap: ",np.mean(overlap))
-print("Forgeting: ",np.mean(forgeting))
-print("***********************************")
-
-# Union Bound
-# Cumulative Forgetting
-Task = 3 # 1 to 4
-ex = 5
-grid = 20
-epochs = 100
-forgeting = []
-ratio = []
-overlap = []
-# torch.manual_seed(42)
-for _ in range(ex):
-  overlap_union = None
-  model = KAN([2,3,2], grid_size = grid)
-  optimizer = optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
-  criterion = nn.MSELoss()
-
-  taskLoss1 = train(model, epochs, optimizer, criterion, Task)
-  xx1 = tasks[Task-1][0]
-  for nextTask in range(Task+1,6):
-    xx2 = tasks[nextTask-1][0]
-    s = compute_support_union(model, xx1, xx2, t = 0.0) # s is a list of tensors
-    if overlap_union is None:
-      overlap_union = s
-    else:
-      # Perform element-wise bitwise OR operation on corresponding tensors in the lists
-      overlap_union = [u | v for u, v in zip(overlap_union, s)]
-
-  for nextTask in range(Task+1,6):
-    taskLoss2 = train(model, epochs, optimizer, criterion, nextTask)
-
-  # Sum the elements of each tensor in the list and then sum the results
-  sup = sum([t.sum()/t.numel() for t in overlap_union])
-  prevTaskLoss = evaluate(model, epochs, optimizer, criterion, Task)
-  f = prevTaskLoss - taskLoss1
-  forgeting.append(f)
-  ratio.append(np.round(f/sup, 2)) # Use np.sum(s)
-  overlap.append(sup) # Use np.sum(s)
-
-print("Overlap: ",np.mean(overlap))
-print("Forgeting: ",np.mean(forgeting))
-print("***********************************")
-
+loss_task1 = []
+loss_task2 = []
+loss_task3 = []
+loss_task4 = []
+loss_task5 = []
+'''
 # Trining on Task 1 (Ones addition)
 for epoch in tqdm(range(epochs)):
     # Train
@@ -613,7 +498,6 @@ for epoch in tqdm(range(epochs)):
       loss = criterion(pred, result)
       loss_temp += loss.item()
     loss_task5.append(loss_temp/len(x5))
-print(losst1)
 
 # Trining on Task 2 (Twos addition)
 for epoch in tqdm(range(epochs)):
@@ -681,9 +565,6 @@ for epoch in tqdm(range(epochs)):
       loss_temp += loss.item()
     loss_task5.append(loss_temp/len(x5))
 
-print(losst1)
-print(losst2)
-
 # Trining on Task 3 (Twos addition)
 for epoch in tqdm(range(epochs)):
     # Train
@@ -747,9 +628,6 @@ for epoch in tqdm(range(epochs)):
       loss = criterion(pred, result)
       loss_temp += loss.item()
     loss_task5.append(loss_temp/len(x5))
-
-print(losst2)
-print(losst3)
 
 # Trining on Task 4 (Twos addition)
 for epoch in tqdm(range(epochs)):
@@ -815,9 +693,6 @@ for epoch in tqdm(range(epochs)):
       loss_temp += loss.item()
     loss_task5.append(loss_temp/len(x5))
 
-print(losst3)
-print(losst4)
-
 # Trining on Task 5 (Twos addition)
 for epoch in tqdm(range(epochs)):
     # Train
@@ -882,3 +757,4 @@ for epoch in tqdm(range(epochs)):
       loss = criterion(pred, result)
       loss_temp += loss.item()
     loss_task2.append(loss_temp/len(x2))
+    '''
