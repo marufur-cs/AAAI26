@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 from load_data import *
-from code_imageEx.KANTransformer import *
+from KANTransformer import *
 import csv
 import argparse
 
