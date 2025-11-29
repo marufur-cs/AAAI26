@@ -30,9 +30,6 @@ if arg.model_path=="None":
 
 else:
     print("Evaluating pretrained model from-", arg.model_path, "on dataset-",arg.eval_dataset)
-    # quantization_config = BitsAndBytesConfig(load_in_8bit=True)
-    # model = AutoModelForCausalLM.from_pretrained(arg.model_path, quantization_config=quantization_config, device_map="auto", torch_dtype=torch.float16)
-    # tokenizer = AutoTokenizer.from_pretrained(arg.model_path, quantization_config=quantization_config, device_map="auto")
 
     model = torch.load(arg.model_path, weights_only=False)
     model.eval()
@@ -42,23 +39,14 @@ task_list = arg.eval_dataset.split(",")
 lm = HFLM(pretrained=model, tokenizer=tokenizer)
 
 batch_size = 10
-# ,temperature= 0.7,top_p=0.9"
 results = evaluator.simple_evaluate(
     model=lm,
     tasks=task_list,
-    # num_fewshot = 0,
-    # gen_kwargs="do_sample=False",
     batch_size=batch_size,
     confirm_run_unsafe_code=True,
     device="cuda"
-    # limit=100
 )
-
-# Print and analyze the results
 
 for task, metrics in results["results"].items():
     print(metrics,",")
 
-# commonsense_qa
-# gsm8k
-# headqa

@@ -16,34 +16,9 @@ def set_seed(seed):
     torch.backends.cudnn.benchmark = False
 
 def load_llm(arg):
-    # Load tokenizer and model
     model_name = arg.model_name
-    # set_seed(arg.seed)
-
-    pretrained_lora_model_path = arg.continue_training_model
-
-    # model = LlamaForCausalLM.from_pretrained(
-    #     model_name,
-    #     quantization_config=BitsAndBytesConfig(load_in_8bit=True),  # Use 8-bit quantization if needed
-    #     device_map="auto",   # Automatically map model to GPU
-    #     trust_remote_code=True
-    # )
-
 
     if arg.adapter_type == "mlplora":
-        # print("loading mlp lora adapter model")
-        # # Load the LoRA-adapted model
-        # peft_config = LoraConfig(
-        # r = arg.lora_r,
-        # lora_alpha = arg.lora_alpha, 
-        # target_modules=["q_proj", "v_proj"],
-        # lora_dropout=0.1,
-        # bias="none", 
-        # task_type="CAUSAL_LM"
-        # )
-        # model = get_peft_model(model, peft_config)
-        # model.print_trainable_parameters()
-
         print("loading model with MLP lora adapter")
         # Load the LoRA-adapted model
         model = LlamaForCausalLM.from_pretrained(
@@ -141,8 +116,5 @@ def load_llm(arg):
     if arg.continue_training_model != "None":
         print("Training again")
         model=torch.load(arg.continue_training_model, map_location="cuda",weights_only=False) 
-
-
-    
 
     return model

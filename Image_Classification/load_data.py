@@ -53,7 +53,6 @@ def get_tasks(dataset_name, resize = None, quantize = None):
         print("Using CIFAR-10 dataset")
         train_dataset = datasets.CIFAR10(root="./data", train=True, transform=transform, download=True)
 
-        tasks = [(1, 2), (3, 4), (5, 6), (7, 8), (9, 0)]  # Define task splits
         task1 = get_task_data(train_dataset, (1, 2))
         task2 = get_task_data(train_dataset, (3, 4))
         task3 = get_task_data(train_dataset, (5, 6))
@@ -65,7 +64,6 @@ def get_tasks(dataset_name, resize = None, quantize = None):
         data_dir = '/deac/csc/yangGrp/rahmm224/datasets/tiny-imagenet-200'
         train_dataset = datasets.ImageFolder(root=f'{data_dir}/train', transform=transform)
 
-        tasks = [(1, 2), (3, 4), (5, 6), (7, 8), (9, 0)]  # Define task splits
         task1 = get_task_data(train_dataset, (0, 1))
         task2 = get_task_data(train_dataset, (2, 3))
         task3 = get_task_data(train_dataset, (4, 5))
@@ -76,7 +74,6 @@ def get_tasks(dataset_name, resize = None, quantize = None):
     elif dataset_name == "mnist": # Shape is 28 for MNIST
         train_dataset = datasets.MNIST(root="./data", train=True, transform=transform, download=True)
 
-        tasks = [(1, 2), (3, 4), (5, 6), (7, 8), (9, 0)]  # Define task splits
         task1 = get_task_data(train_dataset, (1, 2))
         task2 = get_task_data(train_dataset, (3, 4))
         task3 = get_task_data(train_dataset, (5, 6))

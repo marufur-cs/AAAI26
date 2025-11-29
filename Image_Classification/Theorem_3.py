@@ -20,10 +20,10 @@ epochs = 10
 bc = 5
 resize = 64
 q = 128
-# Load CIFAR-10 dataset
+# Load tasks from Tiny-ImageNet
 task1c, task2c, task3c, task4c,task5c = get_tasks("tiny_imagenet", resize=resize, quantize=q)
 tasks = [task1c, task2c, task3c, task4c, task5c]
-shape = resize if resize else 64  # Default shape for CIFAR-10 is 32
+shape = resize if resize else 64 
 # for Task in tqdm(range(1,5)): # Task 1 to 4
 Task = 1
 forget = []

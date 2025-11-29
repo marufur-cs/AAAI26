@@ -55,8 +55,6 @@ def tokenize_func(examples, tokenizer, arg):
 
 def tokenize_with_loss_mask(example, tokenizer, arg):
     split_prompt = example["text"].split("Response:", maxsplit=1)
-    # print(example["text"])
-    # print(split_prompt)
     input_part = split_prompt[0] + "Response: "  # keep "Response:" attached
     response_part = split_prompt[1].strip() 
 
@@ -68,8 +66,6 @@ def tokenize_with_loss_mask(example, tokenizer, arg):
     labels = encoded["input_ids"].copy()
     prompt_length = len(prompt_encoded)
     labels[:prompt_length] = [-100] * prompt_length
-    # attention = sum(encoded["attention_mask"])
-    # labels[attention:] = [-100] * (len(labels) - attention)
 
     return {
         "input_ids": encoded["input_ids"],

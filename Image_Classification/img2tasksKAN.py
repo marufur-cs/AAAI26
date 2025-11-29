@@ -20,9 +20,10 @@ elif args.dataset == 'tiny-imagenet':
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
-# Load CIFAR-10 dataset
-task1, task2, task3, task4,task5 = get_tasks(args.dataset)
+# Load different tasks from the dataset
+task1, task2, task3, task4, task5 = get_tasks(args.dataset)
 
+# Model configurations: (grid_size, class_layers, num_blocks, num_heads)
 model_config = {1:(5,1,1,1),
                 2:(10,1,1,1),
                 3:(10,1,1,2),

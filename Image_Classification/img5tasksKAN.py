@@ -11,7 +11,7 @@ import argparse
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
-# Load CIFAR-10 dataset
+# Load different tasks from the dataset
 task1c, task2c, task3c, task4c,task5c = get_tasks("cifar10")
 cifartasks = [task1c, task2c, task3c, task4c, task5c]
 task1t, task2t, task3t, task4t,task5t = get_tasks("tiny_imagenet")

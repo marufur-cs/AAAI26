@@ -42,40 +42,8 @@ parser.add_argument('--fisher_mem', type=int, help="fisher_mem")
 
 # Parse the arguments
 config = parser.parse_args()
-print(vars(config))
-
-
-
-# data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
-
-# training_args = TrainingArguments(
-#     output_dir="./llama",
-
-#     save_strategy="no",  # Disables all checkpoint saving
-
-#     run_name=arg.save_model,
-#     per_device_train_batch_size=arg.training_batch,
-#     gradient_accumulation_steps=10,
-#     eval_strategy="epoch",
-#     # save_strategy="epoch",
-#     # save_total_limit=1,
-#     learning_rate=arg.lr,
-#     logging_steps=10,
-#     num_train_epochs=arg.epochs,
-#     warmup_steps=arg.warmup_steps,
-#     weight_decay=0.01,
-#     fp16=True,
-#     push_to_hub=False,
-#     # label_names=["labels"]
-# )
 print("GPU Name:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "No GPU detected")
 
-# if torch.cuda.device_count()>1:
-#    model = nn.DataParallel(model)
-
-# print("Task: ", config.save_model)
-
- 
 # --- begin editing ---
 editor = load_editor(config)
 acc = []

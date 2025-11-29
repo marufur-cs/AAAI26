@@ -295,7 +295,7 @@ class PositionalEmbedding(nn.Module):
 
         # make embeddings relatively larger
         x = x * math.sqrt(self.embed_dim)
-        #add constant to embedding
+        # add constant to embedding
         seq_len = x.size(1)
         x = x + torch.autograd.Variable(self.pe[:,:seq_len], requires_grad=False)
         return x

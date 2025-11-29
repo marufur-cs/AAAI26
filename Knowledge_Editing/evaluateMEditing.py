@@ -10,7 +10,6 @@ def eval(arg, model, m):
     tokenizer.pad_token = tokenizer.eos_token  # Set pad token to EOS token
     model.eval()
     model.to("cuda")
-    # model = AutoModelForCausalLM.from_pretrained(model_name, device_map="auto", torch_dtype=torch.float16)
     print(f"Testing after {m+1} trained tasks")
     rs = 0
     for i in range(m+1):
@@ -20,11 +19,9 @@ def eval(arg, model, m):
                 dataset_path = "/deac/csc/yangGrp/rahmm224/datasets/zsre_"+str(arg.sample_per_task)+"/set"+str(i)
         dataset = dataset = load_from_disk(dataset_path)
         
-        correct_r = 0 # Reliability
-
+        # Evaluating reliability
+        correct_r = 0 
         for j in range(len(dataset['train'])):
-                # Reliability
-                
                 if arg.dataset=="counterfact":
                         prompt = f"Input: {dataset['train'][j]['prompt']}\nResponse: "
                         target_new = dataset['train'][j]['target_new']
@@ -36,13 +33,9 @@ def eval(arg, model, m):
                 output = model.generate(**inputs,do_sample=False, max_new_tokens=5, eos_token_id=tokenizer.eos_token_id)
                 end = time.time()
                 generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
-                # print(f"Prompt: {prompt}")
-                # print(f"Target: {target_new}")
-                
 
                 if prompt in generated_text:
                         generated_text = generated_text[len(prompt):].strip()
-                # print(f"Generated text: {generated_text}")
                 correct_r += int(target_new.lower() in generated_text.lower())
                 
         r = correct_r/len(dataset['train'])
@@ -50,7 +43,6 @@ def eval(arg, model, m):
         print(f"Datasset: {arg.dataset}{arg.sample_per_task}, Task num:{i+1}, Reliability: {r}")
         print(f"Inference time {i+1}: {end - start:.6f} seconds")
     if m > 0:
-        # print("Average Reliability: ", (rs-r)/(m))
         return (rs-r)/(m)
     else:
         return 0.0
