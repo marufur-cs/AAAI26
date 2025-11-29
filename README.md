@@ -2,4 +2,4 @@
 <b> Catastrophic Forgetting</b> is a core challenge in continual learning, where neural networks tend to lose knowledge of previously learned tasks when trained on new tasks. Recent architectural developments such as **Kolmogorov-Arnold Networks (KANs)** have been suggested to offer great robustness against forgetting compared to traditional Multi-Layer Perceptrons (MLPs).
 
 This project presents a comprehensive study of the forgetting behavior in KANs. We introduce a theoritical framework connecting forgetting to _activation support overlap_ and _data intrinsic dimensionality_, and validate our theoretical insights through experiments on synthetic and vision datasets. Additionally, we introduce **KAN-LoRA**, a novel adapter design for parameter-efficient fine-tuning of language models, and evaluate its effectiveness in knowledge editing tasks.
-### This work has been accepted to the main technical track of AAAI 2026
+### :star2:This work has been accepted to the main technical track of AAAI 2026
